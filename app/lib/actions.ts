@@ -43,7 +43,7 @@ const FormSchema = z.object({
     // If form validation fails, return errors early. Otherwise, continue.
     if (!validatedFields.success) {
       return {
-        errors: validatedFields.error.flatten().fieldErrors,
+      
         message: 'Missing Fields. Failed to Create Invoice.',
       };
     }
@@ -59,8 +59,7 @@ const FormSchema = z.object({
         INSERT INTO invoices (customer_id, amount, status, date)
         VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
       `;
-    } catch (error) {
-      // If a database error occurs, return a more specific error.
+    } catch {
       return {
         message: 'Database Error: Failed to Create Invoice.',
       };
@@ -99,10 +98,9 @@ const FormSchema = z.object({
         SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
         WHERE id = ${id}
       `;
-    } catch (error) {
+    } catch {
       return { message: 'Database Error: Failed to Update Invoice.' };
     }
-   
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
   }
