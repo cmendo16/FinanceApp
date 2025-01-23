@@ -40,13 +40,13 @@ const FormSchema = z.object({
       status: formData.get('status'),
     });
    
-    // If form validation fails, return errors early. Otherwise, continue.
-    if (!validatedFields.success) {
-      return {
-      
-        message: 'Missing Fields. Failed to Create Invoice.',
-      };
-    }
+     // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Invoice.',
+    };
+  }
    
     // Prepare data for insertion into the database
     const { customerId, amount, status } = validatedFields.data;
@@ -101,14 +101,20 @@ const FormSchema = z.object({
     } catch {
       return { message: 'Database Error: Failed to Update Invoice.' };
     }
+   
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
   }
-export async function deleteInvoice(id: string) {
-  await sql`DELETE FROM invoices WHERE id = ${id}`;
-  revalidatePath('/dashboard/invoices');
-}
+  export async function deleteInvoice(id: string) {
+    try {
+      await sql`DELETE FROM invoices WHERE id = ${id}`;
+      
+    } catch {
+      throw new Error('Failed to delete the invoice. Please try again later.');
+    }
 
+    revalidatePath('/dashboard/invoices');
+  }
 
 export async function authenticate(
   prevState: string | undefined,
