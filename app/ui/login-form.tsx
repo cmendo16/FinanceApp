@@ -14,7 +14,9 @@ import { useSearchParams } from 'next/navigation';
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const defaultCallbackUrl = process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL || '/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || defaultCallbackUrl;
+
   const [errorMessage, formAction, isPending] = useActionState(
     authenticate,
     undefined,
